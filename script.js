@@ -8,17 +8,14 @@ function saveAll() {
   localStorage.setItem('xp', xp);
 }
 
-// CHAMADA PARA IA
+// CHAMADA PARA IA (simulada)
 async function askAI(prompt) {
   try {
     const response = await fetch("http://localhost:3000/ai", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: prompt })
     });
-
     const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
@@ -26,7 +23,7 @@ async function askAI(prompt) {
   }
 }
 
-//  IA define prioridade
+// DETECTAR PRIORIDADE COM IA
 async function detectPriorityAI(text) {
   const prompt = `Classifique a prioridade da tarefa (responda apenas: high, medium ou low): ${text}`;
   const response = await askAI(prompt);
@@ -36,13 +33,12 @@ async function detectPriorityAI(text) {
   return 'low';
 }
 
-// ADICIONAR TAREFA COM IA
+// ADICIONAR TAREFA
 async function addTask() {
   const input = document.getElementById('taskInput');
   const text = input.value.trim();
   if (!text) return;
 
-  // chama IA
   const aiPriority = await detectPriorityAI(text);
 
   const task = {
@@ -61,10 +57,9 @@ async function addTask() {
   generateInsight();
 }
 
-// CONCLUIR
+// CONCLUIR TAREFA
 function toggleTask(index) {
   tasks[index].completed = !tasks[index].completed;
-
   xp += tasks[index].completed ? 10 : -10;
 
   saveAll();
@@ -73,7 +68,7 @@ function toggleTask(index) {
   generateInsight();
 }
 
-// DELETAR
+// DELETAR TAREFA
 function deleteTask(index) {
   tasks.splice(index, 1);
   saveAll();
@@ -82,14 +77,14 @@ function deleteTask(index) {
   generateInsight();
 }
 
-// CORES
+// CORES POR PRIORIDADE
 function getPriorityColor(priority) {
   if (priority === 'high') return '#ff4d4d';
   if (priority === 'medium') return '#ffc107';
   return '#00c6ff';
 }
 
-// 🖥 RENDER
+// RENDERIZAR TAREFAS
 function renderTasks() {
   const list = document.getElementById('taskList');
   list.innerHTML = '';
@@ -103,7 +98,6 @@ function renderTasks() {
     const li = document.createElement('li');
 
     if (task.completed) li.classList.add('completed');
-
     li.style.borderLeft = `5px solid ${getPriorityColor(task.priority)}`;
 
     li.innerHTML = `
@@ -116,7 +110,7 @@ function renderTasks() {
   });
 }
 
-// 🤖 INSIGHT COM IA
+// INSIGHT COM IA
 async function generateInsight() {
   const suggestion = document.getElementById('suggestion');
 
@@ -138,15 +132,13 @@ async function generateInsight() {
 function updateDashboard() {
   const done = tasks.filter(t => t.completed).length;
   const total = tasks.length;
-  const level = Math.floor(xp / 50);
-
+  
   document.getElementById('stats').innerHTML = `
     <p>✅ Concluídas: ${done}/${total}</p>
-   
   `;
 }
 
-// CHAT IA
+// CHAT COM IA
 async function sendMessage() {
   const input = document.getElementById('chatInput');
   const chatBox = document.getElementById('chatBox');
@@ -171,7 +163,7 @@ async function sendMessage() {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// INIT
+// INICIALIZAÇÃO
 function init() {
   renderTasks();
   updateDashboard();
