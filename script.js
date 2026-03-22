@@ -1,4 +1,4 @@
-// script.js - NeuroTask PRO (IA + Gamificação + Prioridade + Dashboard)
+// script.js - NeuroTask PRO + IA REAL
 
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let xp = parseInt(localStorage.getItem('xp')) || 0;
@@ -8,22 +8,47 @@ function saveAll() {
   localStorage.setItem('xp', xp);
 }
 
-function detectPriority(text) {
-  const t = text.toLowerCase();
-  if (t.includes('prova') || t.includes('urgente') || t.includes('trabalho')) return 'high';
-  if (t.includes('estudar') || t.includes('projeto')) return 'medium';
+// 🔥 CHAMADA PARA IA
+async function askAI(prompt) {
+  try {
+    const response = await fetch("http://localhost:3000/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: prompt })
+    });
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    return "Erro ao conectar com a IA.";
+  }
+}
+
+// 🎯 IA define prioridade
+async function detectPriorityAI(text) {
+  const prompt = `Classifique a prioridade da tarefa (responda apenas: high, medium ou low): ${text}`;
+  const response = await askAI(prompt);
+
+  if (response.toLowerCase().includes('high')) return 'high';
+  if (response.toLowerCase().includes('medium')) return 'medium';
   return 'low';
 }
 
-function addTask() {
+// ➕ ADICIONAR TAREFA COM IA
+async function addTask() {
   const input = document.getElementById('taskInput');
   const text = input.value.trim();
   if (!text) return;
 
+  // chama IA
+  const aiPriority = await detectPriorityAI(text);
+
   const task = {
     text,
     completed: false,
-    priority: detectPriority(text),
+    priority: aiPriority,
     createdAt: new Date()
   };
 
@@ -36,6 +61,7 @@ function addTask() {
   generateInsight();
 }
 
+// ✔️ CONCLUIR
 function toggleTask(index) {
   tasks[index].completed = !tasks[index].completed;
 
@@ -51,6 +77,7 @@ function toggleTask(index) {
   generateInsight();
 }
 
+// 🗑 DELETAR
 function deleteTask(index) {
   tasks.splice(index, 1);
   saveAll();
@@ -59,12 +86,14 @@ function deleteTask(index) {
   generateInsight();
 }
 
+// 🎨 COR PRIORIDADE
 function getPriorityColor(priority) {
   if (priority === 'high') return '#ff4d4d';
   if (priority === 'medium') return '#ffc107';
   return '#00c6ff';
 }
 
+// 🖥 RENDER
 function renderTasks() {
   const list = document.getElementById('taskList');
   list.innerHTML = '';
@@ -91,23 +120,25 @@ function renderTasks() {
   });
 }
 
-function generateInsight() {
+// 🤖 INSIGHT COM IA
+async function generateInsight() {
   const suggestion = document.getElementById('suggestion');
-
-  const pending = tasks.filter(t => !t.completed).length;
-  const done = tasks.filter(t => t.completed).length;
 
   if (tasks.length === 0) {
     suggestion.textContent = 'Adicione tarefas para receber insights inteligentes.';
-  } else if (pending > done) {
-    suggestion.textContent = 'Você está acumulando tarefas. Comece pela mais difícil AGORA.';
-  } else if (done > pending) {
-    suggestion.textContent = 'Alta performance detectada. Continue assim 🔥';
-  } else {
-    suggestion.textContent = 'Equilíbrio ok… mas você pode ir além.';
+    return;
   }
+
+  const taskListText = tasks.map(t => t.text).join(', ');
+
+  const aiResponse = await askAI(
+    `Analise essas tarefas e dê um conselho curto e motivador: ${taskListText}`
+  );
+
+  suggestion.textContent = aiResponse;
 }
 
+// 📊 DASHBOARD
 function updateDashboard() {
   const done = tasks.filter(t => t.completed).length;
   const total = tasks.length;
@@ -115,11 +146,11 @@ function updateDashboard() {
 
   document.getElementById('stats').innerHTML = `
     <p>✅ Concluídas: ${done}/${total}</p>
-    <p>⚡ XP: ${xp}</p>
-    <p>🏆 Nível: ${level}</p>
+    
   `;
 }
 
+// 🚀 INIT
 function init() {
   renderTasks();
   updateDashboard();
