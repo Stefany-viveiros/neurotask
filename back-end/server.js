@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import fetch from "node-fetch"; // 🔹 importante se Node < 18
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.post("/ai", async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (error) {
+    console.error("Erro na IA:", error); // 🔹 mostra o erro real no terminal
     res.status(500).json({ error: "Erro na IA" });
   }
 });

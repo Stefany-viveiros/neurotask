@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/Stefany-viveiros/neurotask/issues"
   },
-  "homepage": "https://github.com/Stefany-viveiros/neurotask#readme"
+  "homepage": "https://github.com/Stefany-viveiros/neurotask#readme",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
 }

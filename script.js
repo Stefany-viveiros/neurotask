@@ -1,5 +1,4 @@
 // script.js - NeuroTask PRO + IA REAL
-
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let xp = parseInt(localStorage.getItem('xp')) || 0;
 
@@ -8,7 +7,7 @@ function saveAll() {
   localStorage.setItem('xp', xp);
 }
 
-// CHAMADA PARA IA (simulada)
+// CHAMADA PARA IA (back-end)
 async function askAI(prompt) {
   try {
     const response = await fetch("http://localhost:3000/ai", {
@@ -17,8 +16,9 @@ async function askAI(prompt) {
       body: JSON.stringify({ message: prompt })
     });
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.choices?.[0]?.message?.content || "Resposta vazia da IA";
   } catch (error) {
+    console.error(error);
     return "Erro ao conectar com a IA.";
   }
 }
@@ -132,7 +132,7 @@ async function generateInsight() {
 function updateDashboard() {
   const done = tasks.filter(t => t.completed).length;
   const total = tasks.length;
-  
+
   document.getElementById('stats').innerHTML = `
     <p>✅ Concluídas: ${done}/${total}</p>
   `;
