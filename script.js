@@ -8,7 +8,7 @@ function saveAll() {
   localStorage.setItem('xp', xp);
 }
 
-// 🔥 CHAMADA PARA IA
+// CHAMADA PARA IA
 async function askAI(prompt) {
   try {
     const response = await fetch("http://localhost:3000/ai", {
@@ -26,7 +26,7 @@ async function askAI(prompt) {
   }
 }
 
-// 🎯 IA define prioridade
+//  IA define prioridade
 async function detectPriorityAI(text) {
   const prompt = `Classifique a prioridade da tarefa (responda apenas: high, medium ou low): ${text}`;
   const response = await askAI(prompt);
@@ -36,7 +36,7 @@ async function detectPriorityAI(text) {
   return 'low';
 }
 
-// ➕ ADICIONAR TAREFA COM IA
+// ADICIONAR TAREFA COM IA
 async function addTask() {
   const input = document.getElementById('taskInput');
   const text = input.value.trim();
@@ -61,15 +61,11 @@ async function addTask() {
   generateInsight();
 }
 
-// ✔️ CONCLUIR
+// CONCLUIR
 function toggleTask(index) {
   tasks[index].completed = !tasks[index].completed;
 
-  if (tasks[index].completed) {
-    xp += 10;
-  } else {
-    xp -= 10;
-  }
+  xp += tasks[index].completed ? 10 : -10;
 
   saveAll();
   renderTasks();
@@ -77,7 +73,7 @@ function toggleTask(index) {
   generateInsight();
 }
 
-// 🗑 DELETAR
+// DELETAR
 function deleteTask(index) {
   tasks.splice(index, 1);
   saveAll();
@@ -86,7 +82,7 @@ function deleteTask(index) {
   generateInsight();
 }
 
-// 🎨 COR PRIORIDADE
+// CORES
 function getPriorityColor(priority) {
   if (priority === 'high') return '#ff4d4d';
   if (priority === 'medium') return '#ffc107';
@@ -138,7 +134,7 @@ async function generateInsight() {
   suggestion.textContent = aiResponse;
 }
 
-// 📊 DASHBOARD
+// DASHBOARD
 function updateDashboard() {
   const done = tasks.filter(t => t.completed).length;
   const total = tasks.length;
@@ -146,11 +142,36 @@ function updateDashboard() {
 
   document.getElementById('stats').innerHTML = `
     <p>✅ Concluídas: ${done}/${total}</p>
-    
+   
   `;
 }
 
-// 🚀 INIT
+// CHAT IA
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const chatBox = document.getElementById('chatBox');
+
+  const message = input.value.trim();
+  if (!message) return;
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-message user';
+  userMsg.textContent = message;
+  chatBox.appendChild(userMsg);
+
+  input.value = '';
+
+  const aiResponse = await askAI(message);
+
+  const aiMsg = document.createElement('div');
+  aiMsg.className = 'chat-message ai';
+  aiMsg.textContent = aiResponse;
+  chatBox.appendChild(aiMsg);
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// INIT
 function init() {
   renderTasks();
   updateDashboard();
