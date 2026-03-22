@@ -1,11 +1,35 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <title>NeuroTask - Lista Inteligente</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
+
+  <div class="app">
+    <h1>🧠 NeuroTask</h1>
+    <p class="subtitle">Sua lista de tarefas com inteligência adaptativa</p>
+
+    <div class="input-area">
+      <input 
+        type="text" 
+        id="taskInput" 
+        placeholder="Digite sua tarefa..."
+      >
+      <button onclick="addTask()">Adicionar</button>
+    </div>
+
+    <ul id="taskList"></ul>
+
+    <div class="insight">
+      <h3>💡 Sugestão Inteligente</h3>
+      <p id="suggestion">
+        Comece adicionando tarefas...
+      </p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
