@@ -1,4 +1,5 @@
-// script.js - NeuroTask PRO + IA REAL
+// script.js - NeuroTask PRO FINAL
+
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let xp = parseInt(localStorage.getItem('xp')) || 0;
 
@@ -7,16 +8,25 @@ function saveAll() {
   localStorage.setItem('xp', xp);
 }
 
-// CHAMADA PARA IA (back-end)
+// CHAMADA PARA IA
 async function askAI(prompt) {
   try {
     const response = await fetch("http://localhost:3000/ai", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ message: prompt })
     });
+
     const data = await response.json();
-    return data.choices?.[0]?.message?.content || "Resposta vazia da IA";
+
+    if (!data.choices) {
+      return "Erro na resposta da IA.";
+    }
+
+    return data.choices[0].message.content;
+
   } catch (error) {
     console.error(error);
     return "Erro ao conectar com a IA.";
@@ -57,7 +67,20 @@ async function addTask() {
   generateInsight();
 }
 
-// CONCLUIR TAREFA
+// EDITAR TAREFA ✏️
+function editTask(index) {
+  const newText = prompt("Editar tarefa:", tasks[index].text);
+
+  if (!newText || newText.trim() === "") return;
+
+  tasks[index].text = newText.trim();
+
+  saveAll();
+  renderTasks();
+  generateInsight();
+}
+
+// CONCLUIR TAREFA ✔️
 function toggleTask(index) {
   tasks[index].completed = !tasks[index].completed;
   xp += tasks[index].completed ? 10 : -10;
@@ -68,7 +91,7 @@ function toggleTask(index) {
   generateInsight();
 }
 
-// DELETAR TAREFA
+// DELETAR TAREFA 🗑️
 function deleteTask(index) {
   tasks.splice(index, 1);
   saveAll();
@@ -103,14 +126,18 @@ function renderTasks() {
     li.innerHTML = `
       <span class="checkbox" onclick="toggleTask(${index})">✔</span>
       <span class="task-text">${task.text}</span>
-      <span class="delete-btn" onclick="deleteTask(${index})">🗑</span>
+
+      <div class="actions">
+        <span onclick="editTask(${index})">✏️</span>
+        <span onclick="deleteTask(${index})">🗑</span>
+      </div>
     `;
 
     list.appendChild(li);
   });
 }
 
-// INSIGHT COM IA
+// INSIGHT COM IA 💡
 async function generateInsight() {
   const suggestion = document.getElementById('suggestion');
 
@@ -138,7 +165,7 @@ function updateDashboard() {
   `;
 }
 
-// CHAT COM IA
+// CHAT COM IA 🤖
 async function sendMessage() {
   const input = document.getElementById('chatInput');
   const chatBox = document.getElementById('chatBox');
@@ -163,17 +190,6 @@ async function sendMessage() {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function editTask(index) {
-  const newText = prompt("Editar tarefa:", tasks[index].text);
-
-  if (!newText || newText.trim() === "") return;
-
-  tasks[index].text = newText.trim();
-
-  saveAll();
-  renderTasks();
-  generateInsight();
-}
 // INICIALIZAÇÃO
 function init() {
   renderTasks();
