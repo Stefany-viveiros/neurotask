@@ -163,6 +163,17 @@ async function sendMessage() {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+function editTask(index) {
+  const newText = prompt("Editar tarefa:", tasks[index].text);
+
+  if (!newText || newText.trim() === "") return;
+
+  tasks[index].text = newText.trim();
+
+  saveAll();
+  renderTasks();
+  generateInsight();
+}
 // INICIALIZAÇÃO
 function init() {
   renderTasks();
