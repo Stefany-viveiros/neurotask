@@ -1,16 +1,23 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import fetch from "node-fetch"; // 🔹 importante se Node < 18
+import fetch from "node-fetch";
 
 dotenv.config();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
+// ROTA IA
 app.post("/ai", async (req, res) => {
   const { message } = req.body;
+
+  // 🔒 Validação
+  if (!message || message.trim() === "") {
+    return res.status(400).json({ error: "Mensagem vazia" });
+  }
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -22,18 +29,41 @@ app.post("/ai", async (req, res) => {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "Você é um assistente de produtividade inteligente." },
-          { role: "user", content: message }
-        ]
+          {
+            role: "system",
+            content: "Você é um assistente de produtividade direto, motivador e prático."
+          },
+          {
+            role: "user",
+            content: message
+          }
+        ],
+        max_tokens: 150
       })
     });
 
     const data = await response.json();
-    res.json(data);
+
+    // 🔥 Tratamento de erro da API
+    if (!response.ok) {
+      console.error("Erro OpenAI:", data);
+      return res.status(500).json({ error: "Erro na API de IA" });
+    }
+
+    // ✅ Retorna só o necessário
+    const aiMessage = data.choices?.[0]?.message?.content || "Sem resposta";
+
+    res.json({ reply: aiMessage });
+
   } catch (error) {
-    console.error("Erro na IA:", error); // 🔹 mostra o erro real no terminal
-    res.status(500).json({ error: "Erro na IA" });
+    console.error("Erro no servidor:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
   }
 });
 
-app.listen(3000, () => console.log("Servidor rodando na porta 3000"));
+// SERVIDOR
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});

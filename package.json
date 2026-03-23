@@ -2,23 +2,27 @@
   "name": "neurotask",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "Sistema web de produtividade com IA (NeuroTask)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Stefany-viveiros/neurotask.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["produtividade", "ia", "tasks", "dashboard"],
+  "author": "Stefany Viveiros",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Stefany-viveiros/neurotask/issues"
   },
   "homepage": "https://github.com/Stefany-viveiros/neurotask#readme",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
     "node-fetch": "^3.3.2"
   }
 }

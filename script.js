@@ -1,14 +1,13 @@
-// script.js - NeuroTask PRO FINAL
-
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let xp = parseInt(localStorage.getItem('xp')) || 0;
 
+// SALVAR
 function saveAll() {
   localStorage.setItem('tasks', JSON.stringify(tasks));
   localStorage.setItem('xp', xp);
 }
 
-// CHAMADA PARA IA
+// IA
 async function askAI(prompt) {
   try {
     const response = await fetch("http://localhost:3000/ai", {
@@ -21,11 +20,7 @@ async function askAI(prompt) {
 
     const data = await response.json();
 
-    if (!data.choices) {
-      return "Erro na resposta da IA.";
-    }
-
-    return data.choices[0].message.content;
+    return data?.choices?.[0]?.message?.content || "Erro na IA.";
 
   } catch (error) {
     console.error(error);
@@ -33,21 +28,25 @@ async function askAI(prompt) {
   }
 }
 
-// DETECTAR PRIORIDADE COM IA
+// PRIORIDADE IA
 async function detectPriorityAI(text) {
-  const prompt = `Classifique a prioridade da tarefa (responda apenas: high, medium ou low): ${text}`;
+  const prompt = `Classifique a prioridade (high, medium, low): ${text}`;
   const response = await askAI(prompt);
 
-  if (response.toLowerCase().includes('high')) return 'high';
-  if (response.toLowerCase().includes('medium')) return 'medium';
+  const res = response.toLowerCase();
+
+  if (res.includes('high')) return 'high';
+  if (res.includes('medium')) return 'medium';
   return 'low';
 }
 
-// ADICIONAR TAREFA
+// ADICIONAR
 async function addTask() {
   const input = document.getElementById('taskInput');
   const text = input.value.trim();
   if (!text) return;
+
+  input.disabled = true;
 
   const aiPriority = await detectPriorityAI(text);
 
@@ -55,11 +54,12 @@ async function addTask() {
     text,
     completed: false,
     priority: aiPriority,
-    createdAt: new Date()
+    createdAt: new Date().toISOString()
   };
 
   tasks.push(task);
   input.value = '';
+  input.disabled = false;
 
   saveAll();
   renderTasks();
@@ -67,11 +67,11 @@ async function addTask() {
   generateInsight();
 }
 
-// EDITAR TAREFA ✏️
+// EDITAR
 function editTask(index) {
   const newText = prompt("Editar tarefa:", tasks[index].text);
 
-  if (!newText || newText.trim() === "") return;
+  if (!newText?.trim()) return;
 
   tasks[index].text = newText.trim();
 
@@ -80,10 +80,12 @@ function editTask(index) {
   generateInsight();
 }
 
-// CONCLUIR TAREFA ✔️
+// TOGGLE
 function toggleTask(index) {
   tasks[index].completed = !tasks[index].completed;
+
   xp += tasks[index].completed ? 10 : -10;
+  xp = Math.max(0, xp); // proteção
 
   saveAll();
   renderTasks();
@@ -91,65 +93,69 @@ function toggleTask(index) {
   generateInsight();
 }
 
-// DELETAR TAREFA 🗑️
+// DELETE
 function deleteTask(index) {
   tasks.splice(index, 1);
+
   saveAll();
   renderTasks();
   updateDashboard();
   generateInsight();
 }
 
-// CORES POR PRIORIDADE
+// COR PRIORIDADE
 function getPriorityColor(priority) {
-  if (priority === 'high') return '#ff4d4d';
-  if (priority === 'medium') return '#ffc107';
-  return '#00c6ff';
+  return {
+    high: '#ff4d4d',
+    medium: '#ffc107',
+    low: '#00c6ff'
+  }[priority];
 }
 
-// RENDERIZAR TAREFAS
+// RENDER
 function renderTasks() {
   const list = document.getElementById('taskList');
   list.innerHTML = '';
 
-  tasks.sort((a, b) => {
-    const order = { high: 3, medium: 2, low: 1 };
-    return order[b.priority] - order[a.priority];
-  });
+  const order = { high: 3, medium: 2, low: 1 };
 
-  tasks.forEach((task, index) => {
-    const li = document.createElement('li');
+  tasks
+    .sort((a, b) => order[b.priority] - order[a.priority])
+    .forEach((task, index) => {
+      const li = document.createElement('li');
 
-    if (task.completed) li.classList.add('completed');
-    li.style.borderLeft = `5px solid ${getPriorityColor(task.priority)}`;
+      if (task.completed) li.classList.add('completed');
+      li.style.borderLeft = `5px solid ${getPriorityColor(task.priority)}`;
 
-    li.innerHTML = `
-      <span class="checkbox" onclick="toggleTask(${index})">✔</span>
-      <span class="task-text">${task.text}</span>
+      li.innerHTML = `
+        <span class="checkbox" onclick="toggleTask(${index})">✔</span>
+        <span class="task-text">${task.text}</span>
 
-      <div class="actions">
-        <span onclick="editTask(${index})">✏️</span>
-        <span onclick="deleteTask(${index})">🗑</span>
-      </div>
-    `;
+        <div class="actions">
+          <span onclick="editTask(${index})">✏️</span>
+          <span onclick="deleteTask(${index})">🗑</span>
+        </div>
+      `;
 
-    list.appendChild(li);
-  });
+      list.appendChild(li);
+    });
 }
 
-// INSIGHT COM IA 💡
+// INSIGHT IA
 async function generateInsight() {
   const suggestion = document.getElementById('suggestion');
 
   if (tasks.length === 0) {
-    suggestion.textContent = 'Adicione tarefas para receber insights inteligentes.';
+    suggestion.textContent = 'Adicione tarefas para receber insights.';
     return;
   }
+
+  suggestion.textContent = '⏳ Analisando...';
 
   const taskListText = tasks.map(t => t.text).join(', ');
 
   const aiResponse = await askAI(
-    `Analise essas tarefas e dê um conselho curto e motivador: ${taskListText}`
+    `Dê um conselho curto e motivador para: ${taskListText}`
   );
 
   suggestion.textContent = aiResponse;
@@ -161,11 +167,12 @@ function updateDashboard() {
   const total = tasks.length;
 
   document.getElementById('stats').innerHTML = `
-    <p>✅ Concluídas: ${done}/${total}</p>
+    <p>✅ ${done}/${total} concluídas</p>
+    <p>⚡ XP: ${xp}</p>
   `;
 }
 
-// CHAT COM IA 🤖
+// CHAT IA
 async function sendMessage() {
   const input = document.getElementById('chatInput');
   const chatBox = document.getElementById('chatBox');
@@ -180,7 +187,13 @@ async function sendMessage() {
 
   input.value = '';
 
+  const loading = document.createElement('div');
+  loading.textContent = 'IA está digitando...';
+  chatBox.appendChild(loading);
+
   const aiResponse = await askAI(message);
+
+  chatBox.removeChild(loading);
 
   const aiMsg = document.createElement('div');
   aiMsg.className = 'chat-message ai';
@@ -190,7 +203,7 @@ async function sendMessage() {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// INICIALIZAÇÃO
+// INIT
 function init() {
   renderTasks();
   updateDashboard();

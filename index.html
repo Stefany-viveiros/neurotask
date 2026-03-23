@@ -8,33 +8,51 @@
 <body>
 
   <div class="app">
-    <h1>🧠 NeuroTask</h1>
-    <p class="subtitle">Sua lista de tarefas com inteligência adaptativa</p>
 
-    <div class="input-area">
-      <input 
-        type="text" 
-        id="taskInput" 
-        placeholder="Digite sua tarefa..."
-      >
-      <button onclick="addTask()">Adicionar</button>
-    </div>
+    <header class="header">
+      <h1>🧠 NeuroTask</h1>
+      <p class="subtitle">Sua lista de tarefas com inteligência adaptativa</p>
+    </header>
 
-    <ul id="taskList"></ul>
+    <div class="main">
 
-    <div class="insight">
-      <div id="stats"></div>
-      <h3>💡 Sugestão Inteligente</h3>
-      <p id="suggestion">Comece adicionando tarefas...</p>
-    </div>
+      <!-- TAREFAS -->
+      <div class="tasks-section">
 
-    <div class="chat-container">
-      <h3>🤖 Assistente IA</h3>
-      <div id="chatBox" class="chat-box"></div>
-      <div class="chat-input">
-        <input id="chatInput" placeholder="Converse com a IA..." />
-        <button onclick="sendMessage()">Enviar</button>
+        <div class="input-area">
+          <input 
+            type="text" 
+            id="taskInput" 
+            placeholder="Digite sua tarefa..."
+          >
+          <button onclick="addTask()">Adicionar</button>
+        </div>
+
+        <ul id="taskList"></ul>
+
       </div>
+
+      <!-- LATERAL -->
+      <div class="side-section">
+
+        <div class="insight">
+          <div id="stats"></div>
+          <h3>💡 Sugestão Inteligente</h3>
+          <p id="suggestion">Comece adicionando tarefas...</p>
+        </div>
+
+        <div class="chat-container">
+          <h3>🤖 Assistente IA</h3>
+          <div id="chatBox" class="chat-box"></div>
+
+          <div class="chat-input-area">
+            <input id="chatInput" placeholder="Converse com a IA..." />
+            <button onclick="sendMessage()">Enviar</button>
+          </div>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
