@@ -5,7 +5,7 @@
   "description": "Sistema web de produtividade com IA (NeuroTask)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node back-end/server.js",
     "dev": "node server.js"
   },
   "repository": {
