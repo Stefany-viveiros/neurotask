@@ -1,6 +1,6 @@
 
 
-console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "OK" : "NÃO CARREGOU");
+console.log ("OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "OK" : "NÃO CARREGOU");
 
 import express from "express";
 import cors from "cors";
