@@ -124,14 +124,45 @@ li.completed {
   margin-left: 10px;
 }
 
+/* AÇÕES */
 .actions {
   display: flex;
   gap: 10px;
 }
 
+/* BOTÕES EDITAR E DELETAR */
+.edit-btn,
 .delete-btn {
+  display: inline-block;
   cursor: pointer;
-  color: #ff4d4d;
+  padding: 5px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+/* HOVER (FUNCIONA COM EMOJI) */
+.edit-btn:hover {
+  background: rgba(255, 193, 7, 0.2); /* amarelo */
+  transform: scale(1.2);
+}
+
+.delete-btn:hover {
+  background: rgba(255, 77, 77, 0.2); /* vermelho */
+  transform: scale(1.2);
+}
+
+/* CLICK */
+.edit-btn:active {
+  background: rgba(255, 193, 7, 0.4);
+}
+
+.delete-btn:active {
+  background: red;
+}
+
+/* CHECKBOX */
+.checkbox {
+  cursor: pointer;
 }
 
 /* INSIGHT */

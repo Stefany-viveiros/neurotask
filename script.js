@@ -7,7 +7,7 @@ function saveAll() {
   localStorage.setItem('xp', xp);
 }
 
-// IA - fetch seguro
+// IA - fetch 
 async function askAI(prompt) {
   try {
     const response = await fetch("http://localhost:3000/ai", {
@@ -120,13 +120,13 @@ function renderTasks() {
       li.style.borderLeft = `5px solid ${getPriorityColor(task.priority)}`;
 
       li.innerHTML = `
-        <span class="checkbox" onclick="toggleTask(${index})">✔</span>
-        <span class="task-text">${task.text}</span>
-        <div class="actions">
-          <span onclick="editTask(${index})">✏️</span>
-          <span onclick="deleteTask(${index})">🗑</span>
-        </div>
-      `;
+  <span class="checkbox" onclick="toggleTask(${index})">✔</span>
+  <span class="task-text">${task.text}</span>
+  <div class="actions">
+    <span class="edit-btn" onclick="editTask(${index})">✏️</span>
+    <span class="delete-btn" onclick="deleteTask(${index})">🗑</span>
+  </div>
+`;
 
       list.appendChild(li);
     });

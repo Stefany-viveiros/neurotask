@@ -23,7 +23,7 @@ app.post("/ai", async (req, res) => {
   }
 
   try {
-    // 🔴 CHAMADA DA API
+    // CHAMADA DA API
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -48,7 +48,7 @@ app.post("/ai", async (req, res) => {
 
     const data = await response.json();
 
-    // 🔴 SE DER ERRO NA API
+    // SE DER ERRO NA API
     if (!response.ok) {
       console.error("🚨 ERRO COMPLETO OPENAI:\n", JSON.stringify(data, null, 2));
       return res.status(500).json({
@@ -56,7 +56,7 @@ app.post("/ai", async (req, res) => {
       });
     }
 
-    // 🔴 SEGURANÇA EXTRA
+    // SEGURANÇA
     if (!data.choices || data.choices.length === 0) {
       console.error("Resposta vazia:", data);
       return res.status(500).json({ error: "Sem resposta da IA" });
